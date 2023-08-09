@@ -74,6 +74,7 @@ class _MyAppState extends State<MyApp> {
                       );
                       setState(() {
                         listView;
+                        enabled = false;
                       });
                     }
                   : null,
