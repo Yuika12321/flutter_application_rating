@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_tab/meal_api.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 void main() {
@@ -17,70 +18,82 @@ class _MyAppState extends State<MyApp> {
   bool enabled = false;
   List<Score> score = [];
   double rate = 0;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    score.add(Score(rate: 5, comment: '맛나요'));
-  }
 
   @override
   Widget build(BuildContext context) {
-    var listView = ListView.builder(
+    var listView = ListView.separated(
+      itemCount: score.length,
+      separatorBuilder: (context, index) => const Divider(),
       itemBuilder: (context, index) => ListTile(
         leading: Text('${score[index].rate}'),
         title: Text(score[index].comment),
       ),
     );
-
     return MaterialApp(
       home: Scaffold(
         body: Column(
           children: [
             RatingBar.builder(
               initialRating: 3,
-              minRating: 0.5,
+              minRating: 1,
               direction: Axis.horizontal,
               allowHalfRating: true,
               itemCount: 5,
               itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
               itemBuilder: (context, _) => const Icon(
                 Icons.star,
-                color: Colors.amber,
+                color: Color.fromARGB(255, 60, 0, 255),
               ),
               onRatingUpdate: (value) {
                 setState(() {
                   rate = value;
                   enabled = true;
                 });
-                print(value);
               },
             ),
             TextFormField(
+              validator: (value) {
+                if (value.toString().trim().isEmpty) {
+                  return 'space';
+                }
+                return null;
+              },
               controller: controller,
               enabled: enabled,
               decoration: const InputDecoration(
-                hintText: '한마디 해줘',
-                label: Text('??'),
+                hintText: '한마디 해주세요',
+                label: Text('여긴뭘까?'),
                 border: OutlineInputBorder(),
               ),
               maxLength: 30,
             ),
             ElevatedButton(
               onPressed: enabled
-                  ? () {
+                  ? () async {
+                      var api = MealApi();
+                      //2023-08-16 16:55:45
+                      var evalDate = DateTime.now().toString().split(' ')[0];
+                      var res =
+                          await api.insert(evalDate, rate, controller.text);
+                      print(res);
+
+                      //----------------------------
                       score.add(
-                        Score(rate: rate, comment: controller.text),
+                        Score(
+                          rate: rate,
+                          comment: controller.text,
+                        ),
                       );
                       setState(() {
                         listView;
                         enabled = false;
                       });
+                      print(score.length);
                     }
                   : null,
               child: const Text('저장하기'),
             ),
-            Expanded(child: listView)
+            Expanded(child: listView),
           ],
         ),
       ),
