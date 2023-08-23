@@ -30,12 +30,13 @@ class _NaviPageState extends State<NaviPage> {
   ];
 
   dynamic page = const MyApp();
-  var pages = [const MyApp(), const MyApp(), Result()];
+  var pages = [const MyApp(), const MyApp(), const Result()];
   int _index = 0;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: page,
         bottomNavigationBar: BottomNavigationBar(
